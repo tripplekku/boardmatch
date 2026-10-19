@@ -1,0 +1,159 @@
+{
+  "entities": {
+    "BoardGame": {
+      "title": "BoardGame",
+      "description": "A board game record with player counts, playtime, complexity, categories, and mechanics",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the board game"
+        },
+        "title": {
+          "type": "string",
+          "description": "Ukrainian or localized title of the game",
+          "maxLength": 100
+        },
+        "originalTitle": {
+          "type": "string",
+          "description": "Original English or international title",
+          "maxLength": 100
+        },
+        "description": {
+          "type": "string",
+          "description": "Summary of gameplay, setting and theme",
+          "maxLength": 1000
+        },
+        "minPlayers": {
+          "type": "number",
+          "description": "Minimum player count"
+        },
+        "maxPlayers": {
+          "type": "number",
+          "description": "Maximum player count"
+        },
+        "bestPlayers": {
+          "type": "string",
+          "description": "Optimal player count description e.g. 3-4",
+          "maxLength": 20
+        },
+        "minPlaytime": {
+          "type": "number",
+          "description": "Minimum playtime in minutes"
+        },
+        "maxPlaytime": {
+          "type": "number",
+          "description": "Maximum playtime in minutes"
+        },
+        "complexity": {
+          "type": "string",
+          "description": "Complexity tier",
+          "enum": ["light", "medium", "heavy"]
+        },
+        "category": {
+          "type": "string",
+          "description": "Primary genre category",
+          "enum": ["strategy", "party", "cooperative", "family", "thematic", "abstract", "deckbuilding"]
+        },
+        "age": {
+          "type": "number",
+          "description": "Recommended minimum age"
+        },
+        "rating": {
+          "type": "number",
+          "description": "BGG/community rating out of 10"
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "Cover image path or URL",
+          "maxLength": 500
+        },
+        "mechanics": {
+          "type": "array",
+          "description": "Key gameplay mechanics"
+        },
+        "tags": {
+          "type": "array",
+          "description": "Search and preference tags"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp"
+        }
+      },
+      "required": ["id", "title", "minPlayers", "maxPlayers", "minPlaytime", "maxPlaytime", "complexity", "category"]
+    },
+    "UserFavorite": {
+      "title": "UserFavorite",
+      "description": "A saved favorite game for a user",
+      "type": "object",
+      "properties": {
+        "gameId": {
+          "type": "string",
+          "description": "ID of the favorited game",
+          "maxLength": 128
+        },
+        "userId": {
+          "type": "string",
+          "description": "User UID who favorited",
+          "maxLength": 128
+        },
+        "savedAt": {
+          "type": "string",
+          "description": "Timestamp when favorited"
+        }
+      },
+      "required": ["gameId", "userId"]
+    },
+    "RecommendationHistory": {
+      "title": "RecommendationHistory",
+      "description": "Saved past recommendation quiz result",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique history item id"
+        },
+        "userId": {
+          "type": "string",
+          "description": "User UID"
+        },
+        "playerCount": {
+          "type": "number",
+          "description": "Player count queried"
+        },
+        "playtimeRange": {
+          "type": "string",
+          "description": "Selected duration tier"
+        },
+        "selectedGenres": {
+          "type": "array",
+          "description": "Selected genre preference tags"
+        },
+        "topMatchTitle": {
+          "type": "string",
+          "description": "Title of the top recommended game"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Search timestamp"
+        }
+      },
+      "required": ["id", "userId", "playerCount"]
+    }
+  },
+  "firestore": {
+    "/games/{gameId}": {
+      "schema": "BoardGame",
+      "description": "Board games catalog accessible to all users for discovery and filtering"
+    },
+    "/users/{userId}/favorites/{gameId}": {
+      "schema": "UserFavorite",
+      "description": "Personal game favorites for an authenticated user"
+    },
+    "/users/{userId}/recommendations/{historyId}": {
+      "schema": "RecommendationHistory",
+      "description": "Personal history of quiz recommendation searches"
+    }
+  }
+}

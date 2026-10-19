@@ -1,0 +1,6 @@
+{
+  "name": "BoardMatch - Розумні рекомендації настільних ігор",
+  "description": "Персоналізований підбір настільних ігор на основі кількості гравців, тривалості партії та жанрових вподобань з інтегрованою базою даних.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

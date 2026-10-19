@@ -1,0 +1,76 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Safety Net - deny all by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isAdmin() {
+      return isSignedIn() &&
+        request.auth.token.email_verified == true &&
+        request.auth.token.email == 'homenkohoma0@gmail.com';
+    }
+
+    function isValidBoardGame(data) {
+      return data.keys().hasAll(['id', 'title', 'minPlayers', 'maxPlayers', 'minPlaytime', 'maxPlaytime', 'complexity', 'category']) &&
+        data.id is string && data.id.size() <= 128 &&
+        data.title is string && data.title.size() <= 100 &&
+        data.minPlayers is number && data.minPlayers >= 1 &&
+        data.maxPlayers is number && data.maxPlayers >= data.minPlayers &&
+        data.minPlaytime is number && data.minPlaytime >= 5 &&
+        data.maxPlaytime is number && data.maxPlaytime >= data.minPlaytime &&
+        data.complexity in ['light', 'medium', 'heavy'] &&
+        data.category in ['strategy', 'party', 'cooperative', 'family', 'thematic', 'abstract', 'deckbuilding'];
+    }
+
+    function isValidFavorite(data, userId) {
+      return data.keys().hasAll(['gameId', 'userId']) &&
+        data.keys().hasOnly(['gameId', 'userId', 'savedAt']) &&
+        data.gameId is string && data.gameId.size() <= 128 &&
+        data.userId is string && data.userId == userId &&
+        data.userId == request.auth.uid;
+    }
+
+    function isValidRecommendation(data, userId) {
+      return data.keys().hasAll(['id', 'userId', 'playerCount']) &&
+        data.id is string && data.id.size() <= 128 &&
+        data.userId is string && data.userId == userId &&
+        data.userId == request.auth.uid &&
+        data.playerCount is number && data.playerCount >= 1;
+    }
+
+    // Public catalog of board games
+    match /games/{gameId} {
+      allow get, list: if true;
+      allow create, update, delete: if isSignedIn() && (isAdmin() || request.auth.uid != null);
+    }
+
+    // Per-user subcollections (isolated by UID)
+    match /users/{userId} {
+      allow get: if isSignedIn() && request.auth.uid == userId;
+      
+      match /favorites/{gameId} {
+        allow get, list: if isSignedIn() && request.auth.uid == userId;
+        allow create: if isSignedIn() && request.auth.uid == userId && isValidId(gameId) && isValidFavorite(request.resource.data, userId);
+        allow delete: if isSignedIn() && request.auth.uid == userId && isValidId(gameId);
+      }
+
+      match /recommendations/{historyId} {
+        allow get, list: if isSignedIn() && request.auth.uid == userId;
+        allow create: if isSignedIn() && request.auth.uid == userId && isValidId(historyId) && isValidRecommendation(request.resource.data, userId);
+        allow delete: if isSignedIn() && request.auth.uid == userId && isValidId(historyId);
+      }
+    }
+  }
+}
