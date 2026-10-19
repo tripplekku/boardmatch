@@ -1,7 +1,7 @@
 import React from 'react';
-import { Sparkles, Dices, Bookmark, Database, User, LogIn, LogOut } from 'lucide-react';
+import { Sparkles, Dices, Bookmark, Database, User, LogIn, LogOut, Share2 } from 'lucide-react';
 import { auth } from '../firebase';
-import { GoogleAuthProvider, signInWithPopup, signOut, User as FirebaseUser } from 'firebase/auth';
+import { signOut, User as FirebaseUser } from 'firebase/auth';
 
 interface NavbarProps {
   activeTab: 'wizard' | 'catalog' | 'favorites' | 'roulette';
@@ -9,6 +9,8 @@ interface NavbarProps {
   favoritesCount: number;
   user: FirebaseUser | null;
   onOpenAdmin: () => void;
+  onOpenAuth: () => void;
+  onOpenShare: () => void;
   gamesCount: number;
 }
 
@@ -18,22 +20,15 @@ export const Navbar: React.FC<NavbarProps> = ({
   favoritesCount,
   user,
   onOpenAdmin,
+  onOpenAuth,
+  onOpenShare,
   gamesCount,
 }) => {
-  const handleAuth = async () => {
-    if (user) {
-      try {
-        await signOut(auth);
-      } catch (err) {
-        console.error('Sign out error', err);
-      }
-    } else {
-      try {
-        const provider = new GoogleAuthProvider();
-        await signInWithPopup(auth, provider);
-      } catch (err) {
-        console.warn('Google sign-in popup closed or cancelled', err);
-      }
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+    } catch (err) {
+      console.error('Sign out error', err);
     }
   };
 
@@ -103,36 +98,50 @@ export const Navbar: React.FC<NavbarProps> = ({
             title="Керування тестовими даними та базою"
           >
             <Database className="w-3.5 h-3.5" />
-            <span>База даних</span>
+            <span>База</span>
           </button>
         </nav>
 
-        {/* Zone 3: 1 primary action */}
-        <div className="flex items-center gap-3 shrink-0">
+        {/* Zone 3: 1 primary action cluster */}
+        <div className="flex items-center gap-2.5 shrink-0">
+          {/* Share Button */}
+          <button
+            onClick={onOpenShare}
+            className="p-2 sm:px-3 sm:py-1.5 text-xs font-medium text-slate-300 bg-slate-800 hover:bg-slate-700/80 border border-slate-700 rounded-lg transition-colors flex items-center gap-1.5"
+            title="Отримати публічне посилання на сайт"
+          >
+            <Share2 className="w-3.5 h-3.5 text-amber-400" />
+            <span className="hidden sm:inline">Поділитися</span>
+          </button>
+
+          {/* User Account / Auth */}
           {user ? (
-            <div className="flex items-center gap-2.5">
-              <div className="hidden sm:flex flex-col text-right">
-                <span className="text-xs font-medium text-slate-200 truncate max-w-[130px]">
-                  {user.displayName || user.email?.split('@')[0]}
-                </span>
-                <span className="text-[10px] text-slate-400">Синхронізовано</span>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 px-2.5 py-1 bg-slate-800/80 border border-slate-700/70 rounded-lg">
+                <div className="w-6 h-6 rounded-full bg-amber-400/20 text-amber-400 font-bold text-xs flex items-center justify-center">
+                  {(user.displayName || user.email || 'U').charAt(0).toUpperCase()}
+                </div>
+                <div className="hidden sm:flex flex-col text-left">
+                  <span className="text-xs font-medium text-slate-200 truncate max-w-[110px]">
+                    {user.displayName || user.email?.split('@')[0]}
+                  </span>
+                </div>
               </div>
               <button
-                onClick={handleAuth}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-300 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg transition-colors whitespace-nowrap"
-                title="Вийти з профілю"
+                onClick={handleLogout}
+                className="p-2 text-slate-400 hover:text-rose-400 transition-colors"
+                title="Вийти з акаунта"
               >
-                <LogOut className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Вийти</span>
+                <LogOut className="w-4 h-4" />
               </button>
             </div>
           ) : (
             <button
-              onClick={handleAuth}
-              className="flex items-center gap-2 px-3.5 py-1.5 text-xs font-medium text-slate-900 bg-amber-400 hover:bg-amber-300 rounded-lg transition-colors whitespace-nowrap font-medium"
+              onClick={onOpenAuth}
+              className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-slate-950 bg-amber-400 hover:bg-amber-300 rounded-lg transition-colors whitespace-nowrap shadow-sm shadow-amber-500/10"
             >
               <LogIn className="w-3.5 h-3.5" />
-              <span>Увійти через Google</span>
+              <span>Увійти / Реєстрація</span>
             </button>
           )}
         </div>
@@ -169,11 +178,11 @@ export const Navbar: React.FC<NavbarProps> = ({
           <span>Рулетка</span>
         </button>
         <button
-          onClick={onOpenAdmin}
+          onClick={onOpenShare}
           className="flex flex-col items-center gap-1 text-slate-400"
         >
-          <Database className="w-4 h-4" />
-          <span>База</span>
+          <Share2 className="w-4 h-4" />
+          <span>Посилання</span>
         </button>
       </div>
     </header>

@@ -19,6 +19,10 @@ import { QuickRoulette } from './components/QuickRoulette';
 import { GameDetailsModal } from './components/GameDetailsModal';
 import { DatabaseAdminModal } from './components/DatabaseAdminModal';
 import { AddGameModal } from './components/AddGameModal';
+import { AuthModal } from './components/AuthModal';
+import { ShareModal } from './components/ShareModal';
+
+const SHARED_APP_URL = 'https://ais-dev-h26v2dcvuwphjdbazwzuyu-594775970866.europe-west2.run.app';
 
 export default function App() {
   const [user, setUser] = useState<FirebaseUser | null>(null);
@@ -30,6 +34,8 @@ export default function App() {
   const [selectedGameForModal, setSelectedGameForModal] = useState<BoardGame | null>(null);
   const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
 
   // Initialize Firebase and load initial database records
@@ -109,6 +115,8 @@ export default function App() {
         favoritesCount={favorites.length}
         user={user}
         onOpenAdmin={() => setIsAdminModalOpen(true)}
+        onOpenAuth={() => setIsAuthModalOpen(true)}
+        onOpenShare={() => setIsShareModalOpen(true)}
         gamesCount={games.length}
       />
 
@@ -187,16 +195,34 @@ export default function App() {
         onGameAdded={handleGameAdded}
       />
 
+      {/* User Registration & Login Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+      />
+
+      {/* Share Site Modal */}
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        publicUrl={SHARED_APP_URL}
+      />
+
       {/* Minimal Anti-Slop Footer */}
       <footer className="border-t border-slate-900 bg-slate-950 py-6 text-center text-xs text-slate-500">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-slate-300">BoardMatch MVP</span>
+            <span className="font-semibold text-slate-300">BoardMatch</span>
             <span aria-hidden="true">·</span>
             <span>Система персональних рекомендацій настільних ігор</span>
           </div>
           <div className="flex items-center gap-4 text-slate-400">
-            <span>{games.length} ігор у базі</span>
+            <button
+              onClick={() => setIsShareModalOpen(true)}
+              className="hover:text-amber-400 transition-colors"
+            >
+              Отримати посилання
+            </button>
             <span aria-hidden="true">·</span>
             <button
               onClick={() => setIsAdminModalOpen(true)}
