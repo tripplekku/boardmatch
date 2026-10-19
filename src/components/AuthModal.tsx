@@ -46,6 +46,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         return 'Невірний email або пароль. Перевірте введені дані.';
       case 'auth/popup-closed-by-user':
         return 'Вікно авторизації було закрито.';
+      case 'auth/unauthorized-domain':
+        return 'Домен вашого сайту ще не додано до списку дозволених у Firebase Console. Додайте його в Authentication -> Settings -> Authorized domains.';
       case 'auth/operation-not-allowed':
         return 'Вхід за Email/Паролем потребує активації в консолі Firebase. Рекомендуємо скористатися входом через Google!';
       default:

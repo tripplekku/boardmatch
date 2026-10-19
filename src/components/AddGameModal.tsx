@@ -64,7 +64,7 @@ export const AddGameModal: React.FC<AddGameModalProps> = ({
       category,
       age: Number(age),
       rating: Number(rating),
-      imageUrl: '/src/assets/images/boardgame_strategy_1792406331028.jpg',
+      imageUrl: '/images/boardgame_strategy.jpg',
       mechanics: mechanicsStr.split(',').map(s => s.trim()).filter(Boolean),
       tags: tagsStr.split(',').map(s => s.trim()).filter(Boolean),
       createdAt: new Date().toISOString(),

@@ -73,11 +73,13 @@ export const RecommendationWizard: React.FC<RecommendationWizardProps> = ({
             Вкажіть точну кількість гравців, бажаний час та настрій вашої компанії. Наша система зважить всі фактори і підбере найкращі ігри з поясненням кожного вибору.
           </p>
         </div>
-        <div className="absolute right-0 top-0 bottom-0 w-1/3 opacity-20 pointer-events-none hidden sm:block">
+        <div className="absolute right-0 top-0 bottom-0 w-1/3 opacity-20 pointer-events-none hidden sm:block overflow-hidden">
           <img
-            src="/src/assets/images/hero_boardgame_table_1792406329685.jpg"
+            src="/images/hero_boardgame_table.jpg"
             alt="Tabletop board games"
-            referrerPolicy="no-referrer"
+            onError={(e) => {
+              (e.target as HTMLElement).style.display = 'none';
+            }}
             className="w-full h-full object-cover"
           />
         </div>
